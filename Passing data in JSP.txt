@@ -1,0 +1,46 @@
+A web application developed using Java EE would definitely be using JSPs and would indeed involve transferring values from one JSP to another.
+For Example, a user is presented with a form where he fills the required details and presses a Next button where all those details are pre-filled in a non-editable form for him to confirm. The user checks the details to be correct and submits the form for further processing.
+The above scenario is pretty common and involves taking data from one JSP to another. This post addresses the approaches to achieve that.
+
+Approach 1: Using request scope
+
+     <!-- on one jsp from where the values are to be sent -->
+     <% request.setAttribute("attributeName",dataValue);%>
+     <!-- on another jsp where the values are required -->
+     <% request.getAttribute("attributeName");%>
+
+Detail : The values which are to be sent from source jsp are set using setAttribute() method of request object which takes the name of attribute as first argument and the value of attribute as the second argument. The name of attribute can be any user defined string.
+Then on the target jsp, retrieve the value by using the getAttribute() method of request object passing it the same attribute name which was used to set the value. The value stored using this method is stored for current request only.
+
+Approach 2: Using session scope
+
+     <!-- on one jsp from where the values are to be sent -->
+     <% session.setAttribute("attributeName",dataValue);%>
+     <!-- on another jsp where the values are required -->
+     <% session.getAttribute("attributeName");%>		// it is object type can be converted to string using .toString() function.
+
+Detail : The values which are to be sent from source jsp are set using setAttribute() method of session object which takes the name of attribute as first argument and the value of attribute as the second argument. The name of attribute can be any user defined string.
+Then on the target jsp, retrieve the value by using the getAttribute() method of session object passing it the same attribute name which was used to set the value. The value stored using this method is stored for current session only.
+
+Approach 3: Using application scope
+
+     <!-- on one jsp from where the values are to be sent -->
+     <% application.setAttribute("attributeName",dataValue);%>
+     <!-- on another jsp where the values are required -->
+     <% application.getAttribute("attributeName");%>		// it is object type can be converted to string using .toString() function.
+
+Detail : The values which are to be sent from source jsp are set using setAttribute() method of application object which takes the name of attribute as first argument and the value of attribute as the second argument. The name of attribute can be any user defined string.
+Then on the target jsp, retrieve the value by using the getAttribute() method of application object passing it the same attribute name which was used to set the value. The value stored using this method is stored for the entire lifetime of application.
+
+Let’s tweak in:
+
+A JSP has implicit variables for request, session and application scopes with names request, session and application respectively. By implicit, we mean that they are available for use within the jsp page without any declaration.
+Each of the above implicit object corresponds to javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpSession, javax.servlet.ServletContext respectively.
+Besides the above objects, there are a few more implicit objects such as response which is of type javax.servlet.http.HttpServletResponse, out of type javax.servlet.jsp.JspWriter, exception of type javax.servlet.jsp.JspException
+The three scopes request, session and application are in the increasing order of their validity in terms of duration, that is, request is the shortest scope and is upto the duration of a single request, session is for the duration of a user session while application scope lasts for the entire application lifecycle (till the appliation is not shut down)
+setAttribute() method of request, session and application objects accept a java.lang.Object as the type of second argument (the value of attribute to set). Similarly, getAttribute() method of these objects return an object of type java.lang.Object which must be casted to appropriate type before using
+session object may also be retrieved by using request.getSession() method.
+The name of attribute used to store a value in setAttribute() method should exactly match the case when used in getAttribute() method
+getAttribute() returns null if it can’t find a value with the given attribute in the respective scope.
+Calling setAttribute() more than once on any scope object will retain the value given in the last call of this method and will overwrite the previous value.
+All of the scopes can have an attribute with the same name but they will have to be retrieved using appropriate scope references. That is, for retrieving an attribute stored in session use, <% session.getAttribute("website");%> where website is the name of attribute.
